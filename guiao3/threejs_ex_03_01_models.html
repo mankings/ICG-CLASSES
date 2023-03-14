@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<!--
+
+		threejs_ex_03_01_models.html
+
+		J. Madeira - March 2021
+
+-->
+
+<head>
+
+	<title>three.js example 01 &mdash; Some Models</title>
+
+	<meta charset="utf-8">
+
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+	<style>
+		body {
+
+			background-color: #ffffff;
+
+			/* To use the complete page */
+
+			margin: 0px;
+
+			overflow: hidden;
+		}
+	</style>
+
+</head>
+
+<body>
+
+	<!-- The library --- Can be a local version -->
+
+	<script type="text/javascript" src="http://threejs.org/build/three.js"></script>
+
+	<!-- Javascript code that runs the Three.js example -->
+
+	<script type="text/javascript">
+
+		function createTotem(x, z, scaling = new THREE.Vector3(1, 1, 1)) {
+			// Creating a model by grouping basic geometries
+
+			// totem base
+			const baseRadius = 3;
+			const baseHeight = 10;
+			const baseGeometry = new THREE.CylinderGeometry(baseRadius, baseRadius, baseHeight); 
+			const baseMaterial = new THREE.MeshLambertMaterial({ color: 0x444444 });
+			const base = new THREE.Mesh(baseGeometry, baseMaterial);
+
+			// move bottom of base to y = 0
+			base.position.y = baseHeight / 2.0;
+
+			// totem top
+			const topRadius = 5;
+			const topHeight = 2;
+			const topGeometry = new THREE.CylinderGeometry(topRadius, topRadius, topHeight);
+			const topMaterial = new THREE.MeshLambertMaterial({ color: 0x777777 })
+			const top = new THREE.Mesh(topGeometry, topMaterial);
+
+			// move bottom of top to top of base
+			top.position.y = baseHeight + topHeight / 2.0;
+
+			// idol
+			const idolRadius = 6;
+			const idolDetail = 1;
+			var idolGeometry = new THREE.OctahedronGeometry(idolRadius, idolDetail);
+			var idolMaterial = new THREE.MeshLambertMaterial({ color: 0x940500 });
+			var idol = new THREE.Mesh(idolGeometry, idolMaterial);
+			
+			// move idol to above totem
+			const offset = 4;
+			idol.position.y = baseHeight + topHeight + offset + idolRadius / 2.0;
+
+			// idol outlines
+			var idolEdges = new THREE.EdgesGeometry(idolGeometry);
+			var idolLines = new THREE.LineSegments(idolEdges, new THREE.LineBasicMaterial({ color: 0xbb0000 }));
+
+			// move outlines to idol
+			idolLines.position.x = idol.position.x;
+			idolLines.position.y = idol.position.y;
+			idolLines.position.z = idol.position.z;
+
+			// shadows
+			base.castShadow = true;
+			base.receiveShadow = true;
+			top.castShadow = true;
+			top.receiveShadow = true;
+			idol.castShadow = true;
+			idol.receiveShadow = true;
+
+			// whole totem
+			var totem = new THREE.Group();
+			totem.add(base);
+			totem.add(top);
+			totem.add(idol);
+			totem.add(idolLines);
+
+			totem.position.x = x;
+			totem.position.z = z;
+			totem.scale.x = scaling.x;
+			totem.scale.y = scaling.y;
+			totem.scale.z = scaling.z;
+
+			return totem;
+		}
+
+		function createTotemGroup(x, z, offset) {
+			var group = new THREE.Object3D();
+			group.position.set(x, 0, z);
+			var totem1 = createTotem(-offset, offset);
+			var totem2 = createTotem(offset, -offset);
+			group.add(totem1);
+			group.add(totem2);
+			return group;
+		}
+
+		function createSpotlight(x, y, z) {
+			var spotlight = new THREE.SpotLight(0xffffff, 0.5);
+			spotlight.position.set(x, y, z);
+			spotlight.castShadow = true;
+			spotlight.shadow.mapSize.width = 16384;
+			spotlight.shadow.mapSize.height = 16384;
+			return spotlight
+		}
+
+		// Once everything is loaded, run this function
+
+		function init() {
+
+			// The SCENE
+			var scene = new THREE.Scene();
+			scene.background = new THREE.Color(0x000000);
+
+			// The PLANE
+			var planeGeometry = new THREE.PlaneGeometry(150, 150);
+			var planeOutlineGeometry = new THREE.EdgesGeometry(planeGeometry);
+			var planeOutlineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+			var planeOutline = new THREE.LineSegments(planeOutlineGeometry, planeOutlineMaterial);
+			// Rotate and position the plane
+			planeOutline.rotation.x = -0.5 * Math.PI; // TODO: What happens if you comment out this line of code?
+			planeOutline.position.set(0, 0, 0);
+			// Add to the scene
+			scene.add(planeOutline);
+
+			// The coordinate axes
+			var axes = new THREE.AxesHelper(20);
+			// scene.add(axes); 
+
+
+			// Adding models to the scene
+
+			// big totem
+			var totem = createTotem(0, 0, new THREE.Vector3(2, 2, 2));
+			scene.add(totem);
+
+			// small totems
+			var group1 = createTotemGroup(40, 40, 15);
+			scene.add(group1);
+			var group2 = createTotemGroup(-40, 40, 15);
+			group2.rotation.y += 0.5 * Math.PI;
+			scene.add(group2);
+			var group3 = createTotemGroup(40, -40, 15);
+			group3.rotation.y += 0.5 * Math.PI;
+			scene.add(group3);
+			var group4 = createTotemGroup(-40, -40, 15);
+			scene.add(group4);
+
+			var groups = [group1, group2, group3, group4];
+
+			// scene center for rotations 
+			var sceneCenter = new THREE.Object3D();
+			sceneCenter.position.set(0, 0, 0);
+			scene.add(sceneCenter);
+			for (var i = 0; i < groups.length; i++) {
+				sceneCenter.add(groups[i]);
+			}
+			
+			// The CAMERA --- A camera is added to the scene
+			// --- Where the viewer is and how he is looking at the scene
+			var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 400);
+			camera.position.y = 50;
+			camera.position.z = 150;
+			// Point the camera to the center of the scene
+			camera.lookAt(scene.position);
+			scene.add(camera);
+
+			// The SPOTLIGHT (for shadows)
+			scene.add(createSpotlight(74, 1, 74));
+			scene.add(createSpotlight(-74, 1, 74));
+			scene.add(createSpotlight(74, 1, -74));
+			scene.add(createSpotlight(-74, 1, -74));
+			scene.add(createSpotlight(0, 100, 0));
+
+			// The RENDERER --- To display the scene on the Web page
+			var renderer = new THREE.WebGLRenderer({ antialias: true });
+			renderer.setClearColor(new THREE.Color(0xffffff));
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+
+			// Add the output of the renderer
+			document.body.appendChild(renderer.domElement);
+			
+			// Render the scene
+			
+			// var groupRotations = [0.02, -0.03, -0.02, 0.01];
+			// isto roda o totem todo e não só o idol porque eu sou preguiçoso
+			var idolRotation = 0.02;
+			// hover center idol
+			var centerIdolStep = 0.02;	
+			var moveRange = 2;
+			var moveStart = totem.children[2].position.y;
+
+			renderScene();
+
+			function renderScene() {
+				// // tirei group rotation pq ficava feio
+				// for (var i = 0; i < groups.length; i++) {
+				// 	groups[i].rotation.y += groupRotations[i];
+				// } 
+
+				for (var i = 0; i < groups.length; i++) {
+					for (var j = 0; j < groups[i].children.length; j++) {
+						groups[i].children[j].rotation.y += idolRotation;
+					}
+				}
+
+				totem.rotation.y += idolRotation;
+				
+				totem.children[2].position.y += centerIdolStep;
+				totem.children[3].position.y += centerIdolStep;
+
+				if (totem.children[2].position.y > moveStart + moveRange || totem.children[2].position.y < moveStart) {
+					centerIdolStep = -centerIdolStep;
+				}
+
+				sceneCenter.rotation.y -= 0.01;
+
+				requestAnimationFrame(renderScene);
+				renderer.render(scene, camera);
+			}
+		}
+
+		window.onload = init
+
+	</script>
+
+</body>
+
+</html>
