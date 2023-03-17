@@ -1,0 +1,9 @@
+purple: #7b42f5
+yellow: #f5b942
+
+light blue: #38fae0
+orange: #fa6238
+
+blood red: #940500
+red: #ff0900
+dark green: #028f12
