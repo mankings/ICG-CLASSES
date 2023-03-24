@@ -31,7 +31,7 @@ function load3DObjects(sceneGraph) {
     // Create a ground plane
     // ************************** //
     const planeGeometry = new THREE.PlaneGeometry(6, 6);
-    const planeMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(200, 200, 200)', side: THREE.DoubleSide });
+    const planeMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(20, 20, 20)', side: THREE.DoubleSide });
     const planeObject = new THREE.Mesh(planeGeometry, planeMaterial);
     sceneGraph.add(planeObject);
 
@@ -40,57 +40,10 @@ function load3DObjects(sceneGraph) {
     // Set shadow property
     planeObject.receiveShadow = true;
 
-
     // ************************** //
-    // Create a cube
+    // Create a totem
     // ************************** //
-    // Cube center is at (0,0,0)
-    const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-    const cubeMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(255,0,0)' });
-    const cubeObject = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    sceneGraph.add(cubeObject);
-
-    // Set position of the cube
-    // The base of the cube will be on the plane 
-    cubeObject.translateY(0.5);
-
-    // Set shadow property
-    cubeObject.castShadow = true;
-    cubeObject.receiveShadow = true;
-
-
-    // ************************** //
-    // Create a sphere
-    // ************************** //
-    // Sphere center is at (0,0,0)
-    const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-    const sphereMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(180,180,255)' });
-    const sphereObject = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    sceneGraph.add(sphereObject);
-
-    // Set position of the sphere
-    // Move to the left and away from (0,0,0)
-    // The sphere touches the plane
-    sphereObject.translateX(-1.2).translateY(0.5).translateZ(-0.5);
-
-    // Set shadow property
-    sphereObject.castShadow = true;
-
-
-    // ************************** //
-    // Create a cylinder
-    // ************************** //
-    const cylinderGeometry = new THREE.CylinderGeometry(0.2, 0.2, 1.5, 25, 1);
-    const cylinderMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(200,255,150)' });
-    const cylinderObject = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
-    sceneGraph.add(cylinderObject);
-
-    // Set position of the cylinder
-    // Move to the right and towards the camera
-    // The base of the cylinder is on the plane
-    cylinderObject.translateX(0.5).translateY(0.75).translateZ(1.5);
-
-    // Set shadow property
-    cylinderObject.castShadow = true;
+    const totem1 = createTotem(0, 0, new THREE.Vector3(0.1, 0.1, 0.1));
+    sceneGraph.add(totem1);
 }
 

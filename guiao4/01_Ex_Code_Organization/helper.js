@@ -14,6 +14,7 @@ const helper = {
         // Create the 3D scene
         // ************************** //
         sceneElements.sceneGraph = new THREE.Scene();
+        sceneElements.sceneGraph.background = new THREE.Color(0x000000);
 
 
         // ************************** //
@@ -22,8 +23,9 @@ const helper = {
         const width = window.innerWidth;
         const height = window.innerHeight;
         const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 500);
+        //const camera = new THREE.OrthographicCamera(width/-2, width/2, height/2, height/-2);
         sceneElements.camera = camera;
-        camera.position.set(0, 5, 5);
+        camera.position.set(0, 6, 6);
         camera.lookAt(0, 0, 0);
 
 
@@ -41,14 +43,25 @@ const helper = {
         // Add spotlight (with shadows)
         // ***************************** //
         const spotLight = new THREE.SpotLight('rgb(255, 255, 255)', 0.8);
-        spotLight.position.set(-5, 8, 0);
+        spotLight.position.set(-5, 8, 3);
         sceneElements.sceneGraph.add(spotLight);
 
         // Setup shadow properties for the spotlight
         spotLight.castShadow = true;
-        spotLight.shadow.mapSize.width = 2048;
-        spotLight.shadow.mapSize.height = 2048;
+        spotLight.shadow.mapSize.width = 2048 * 6;
+        spotLight.shadow.mapSize.height = 2048 * 6;
 
+        // ***************************** //
+        // Add spotlight (with shadows)
+        // ***************************** //
+        const spotLight2 = new THREE.SpotLight('rgb(255, 255, 255)', 0.8);
+        spotLight2.position.set(0, 8, -5);
+        sceneElements.sceneGraph.add(spotLight2);
+
+        // Setup shadow properties for the spotlight
+        spotLight2.castShadow = true;
+        spotLight2.shadow.mapSize.width = 2048 * 6;
+        spotLight2.shadow.mapSize.height = 2048 * 6;
 
         // *********************************** //
         // Create renderer (with shadow map)

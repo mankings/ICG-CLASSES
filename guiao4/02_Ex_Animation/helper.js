@@ -14,6 +14,7 @@ const helper = {
         // Create the 3D scene
         // ************************** //
         sceneElements.sceneGraph = new THREE.Scene();
+        sceneElements.sceneGraph.background = new THREE.Color(0x000000);
 
 
         // ************************** //
